@@ -49,10 +49,10 @@ export default function ItemDetail({ item, onBack, onUpdateQuantity, onRemove, s
   const formattedAdded = addedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
   return (
-    <div className="flex flex-col h-full bg-[#f4f5f6] relative">
-      <div className="flex-1 overflow-y-auto pb-32">
-        {/* Header Image */}
-        <div className="h-[300px] w-full relative shrink-0">
+    <div className="flex flex-col h-full bg-[#f4f5f6] relative overflow-hidden">
+      <div className="flex-1 flex flex-col">
+        {/* Header Image - Expanded to fill more space as requested */}
+        <div className="h-[260px] w-full relative shrink-0">
           <img 
             src={item.imageUrl} 
             alt={item.name} 
@@ -60,107 +60,96 @@ export default function ItemDetail({ item, onBack, onUpdateQuantity, onRemove, s
             referrerPolicy="no-referrer" 
             onContextMenu={(e) => e.preventDefault()} 
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
           
-          {/* Top Buttons matching RecipeDetail style */}
-          <div className="absolute top-6 left-4 right-4 flex justify-between items-center z-10">
-             <button onClick={onBack} className="w-10 h-10 bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-white/40 transition-colors">
-               <ChevronLeft size={22} className="stroke-[2.5] -ml-0.5" />
+          {/* Top Buttons */}
+          <div className="absolute top-5 left-5 right-5 flex justify-between items-center z-10">
+             <button onClick={onBack} className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-colors">
+               <ChevronLeft size={22} className="stroke-[2.5]" />
              </button>
-             <button onClick={() => onRemove(item.id)} className="w-10 h-10 bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-white/40 transition-colors">
+             <button onClick={() => onRemove(item.id)} className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-colors">
                <Trash2 size={18} />
              </button>
           </div>
 
-          {/* Title & Info Overlay at bottom of image */}
-          <div className="absolute bottom-6 left-6 right-6 flex flex-col gap-2 text-white">
-            <h2 className="text-3xl font-bold tracking-wide leading-tight">{item.name}</h2>
+          {/* Title & Info Overlay - Larger and clearer */}
+          <div className="absolute bottom-6 left-6 right-6 flex flex-col gap-1.5 text-white">
+            <h2 className="text-3xl font-bold tracking-tight leading-tight">{item.name}</h2>
             <div className="flex items-center gap-3 text-sm font-medium">
               <div className="flex items-center gap-1.5 opacity-90">
                 <Clock size={16} />
                 {item.expiryDays} day{item.expiryDays > 1 ? 's' : ''} left
               </div>
-              <div className={`px-3 py-1 rounded-full text-[12px] font-bold tracking-wide ${getExpiryStyle(item.expiryDays)} bg-opacity-90`}>
-                {item.expiryDays <= 2 ? 'Expiring Soon' : item.expiryDays <= 5 ? 'Fresh' : 'Very Fresh'}
+              <div className={`px-3 py-0.5 rounded-full text-[11px] font-bold tracking-wide ${getExpiryStyle(item.expiryDays)} bg-opacity-100`}>
+                {item.expiryDays <= 2 ? 'Expiring Soon' : 'Fresh'}
               </div>
             </div>
           </div>
         </div>
 
-        <div className="px-5 py-6 flex flex-col gap-5 flex-1">
-          {/* Detailed Stats Card */}
-          <div className="bg-white rounded-3xl p-6 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.1)] border border-gray-100 flex flex-col gap-6">
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-between">
-                <span className="text-gray-500 font-medium text-[15px]">Category</span>
-                <span className="px-3 py-1 bg-gray-100 rounded-lg text-gray-800 font-bold text-[13px]">{item.category}</span>
-              </div>
-              <div className="w-full h-[1px] bg-gray-50" />
-              <div className="flex items-center justify-between">
-                <span className="text-gray-500 font-medium text-[15px]">Expiry Date</span>
-                <span className="text-gray-900 font-semibold text-[15px]">{formattedExpiry}</span>
-              </div>
-              <div className="w-full h-[1px] bg-gray-50" />
-              <div className="flex items-center justify-between">
-                <span className="text-gray-500 font-medium text-[15px]">Current Quantity</span>
-                <span className="text-gray-900 font-bold text-[16px]">{item.quantity} {item.unit}</span>
+        <div className="px-5 py-5 flex flex-col gap-4 flex-1 overflow-hidden">
+          {/* Detailed Stats Card - Compact version */}
+          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col gap-2.5">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-500 font-medium font-sans">Category</span>
+              <span className="bg-gray-50 px-2 py-0.5 rounded-md text-gray-700 font-bold">{item.category}</span>
+            </div>
+            <div className="w-full h-px bg-gray-50" />
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-500 font-medium">Expiry Date</span>
+              <span className="text-gray-900 font-semibold">{formattedExpiry}</span>
+            </div>
+            <div className="w-full h-px bg-gray-50" />
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-500 font-medium">Current Quantity</span>
+              <span className="text-gray-900 font-bold">{item.quantity} {item.unit}</span>
+            </div>
+          </div>
+
+          {/* Consumed Actions Card - Compact version */}
+          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col gap-2.5">
+            <div className="flex items-center justify-between">
+               <h3 className="text-sm font-bold text-gray-900">Consume Item</h3>
+               <span className="text-[#FF7A59] font-bold text-sm">{consumePercent}% consumed</span>
+            </div>
+            
+            <div className="flex flex-col gap-2.5">
+              <input 
+                type="range" 
+                min="0" 
+                max="100" 
+                step="5" 
+                value={consumePercent}
+                onChange={(e) => setConsumePercent(Number(e.target.value))}
+                className="w-full h-1.5 rounded-lg appearance-none cursor-pointer outline-none bg-gray-100 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:bg-[#FF7A59] [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white"
+                style={{
+                  background: `linear-gradient(to right, #FF7A59 0%, #FF7A59 ${consumePercent}%, #f3f4f6 ${consumePercent}%, #f3f4f6 100%)`
+                }}
+              />
+              <div className="flex justify-between text-[10px] text-gray-400 font-bold uppercase tracking-wider relative px-0.5">
+                 <span className="w-1/3 text-left">Fresh</span>
+                 <span className="w-1/3 text-center">Half</span>
+                 <span className="w-1/3 text-right">Finished</span>
               </div>
             </div>
           </div>
 
-          {/* Consumed Actions Card */}
-          <div className="bg-white rounded-3xl p-6 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.1)] border border-gray-100 flex flex-col gap-5">
-            <h3 className="text-[17px] font-bold text-gray-900 tracking-tight">Consume Item</h3>
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center justify-between mb-1">
-                 <span className="text-gray-600 font-medium text-[15px]">Progress:</span>
-                 <span className="text-[#FF7A59] font-bold">{consumePercent}% consumed</span>
-              </div>
-              
-              <div className="flex flex-col gap-4 pt-1">
-                <input 
-                  type="range" 
-                  min="0" 
-                  max="100" 
-                  step="5" 
-                  value={consumePercent}
-                  onChange={(e) => setConsumePercent(Number(e.target.value))}
-                  className="w-full h-2 rounded-lg appearance-none cursor-pointer outline-none transition-all [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:bg-[#FF7A59] [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:bg-[#FF7A59] [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:rounded-full"
-                  style={{
-                    background: `linear-gradient(to right, #FF7A59 0%, #FF7A59 ${consumePercent}%, #e5e7eb ${consumePercent}%, #e5e7eb 100%)`
-                  }}
-                />
-                <div className="flex justify-between text-[11px] text-gray-400 font-bold uppercase tracking-widest px-1">
-                   <span>Fresh</span>
-                   <span>Half</span>
-                   <span>Finished</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Meta Info Row */}
-          <div className="flex items-center justify-center gap-2 py-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-gray-300" />
-            <span className="text-[13px] text-gray-400 font-medium">Added to fridge on {formattedAdded}</span>
-            <div className="w-1.5 h-1.5 rounded-full bg-gray-300" />
+          <div className="mt-auto flex flex-col items-center gap-2 pb-2">
+            <span className="text-[11px] text-gray-400 font-medium">Added to fridge on {formattedAdded}</span>
+            
+            <button 
+              onClick={handleUpdate}
+              disabled={consumePercent === initialConsumedPercent}
+              className={`w-full py-3.5 rounded-xl font-bold text-[16px] shadow-lg transition-all ${
+                consumePercent !== initialConsumedPercent 
+                  ? 'bg-[#FF7A59] text-white shadow-[#FF7A59]/20 hover:bg-[#fa6b48]' 
+                  : 'bg-gray-300 text-white cursor-not-allowed shadow-none'
+              }`}
+            >
+              Update Quantity
+            </button>
           </div>
         </div>
-      </div>
-
-      {/* Sticky Bottom Action Button matching RecipeDetail style */}
-      <div className="absolute bottom-0 left-0 right-0 px-6 py-8 bg-gradient-to-t from-[#f4f5f6] via-[#f4f5f6] to-transparent pointer-events-none">
-        <button 
-          onClick={handleUpdate}
-          disabled={consumePercent === initialConsumedPercent}
-          className={`w-full py-4 rounded-[18px] font-bold text-[16px] flex items-center justify-center gap-2 shadow-lg transition-all pointer-events-auto ${
-            consumePercent !== initialConsumedPercent 
-              ? 'bg-[#FF7A59] text-white shadow-[#FF7A59]/30 hover:bg-[#fa6b48] hover:-translate-y-0.5 active:translate-y-0' 
-              : 'bg-gray-300 text-white cursor-not-allowed shadow-none'
-          }`}
-        >
-          Check-in Quantity Update
-        </button>
       </div>
     </div>
   );
