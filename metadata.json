@@ -1,0 +1,6 @@
+{
+  "name": "MyFridge",
+  "description": "Track your fridge inventory and find recipes based on what you have.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
