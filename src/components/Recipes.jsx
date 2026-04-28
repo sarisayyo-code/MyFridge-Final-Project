@@ -28,28 +28,6 @@ export default function Recipes({ inventory, customRecipes, favorites, onAddCust
     setSelectedRecipe(null);
   };
 
-  const handleGenerateAI = async () => {
-    if (inventory.length === 0) {
-      showToast("Add ingredients to fridge first!");
-      return;
-    }
-    setIsGenerating(true);
-    try {
-      const result = await generateRecipesFromInventory(inventory.map(i => i.name));
-      const indexed = result.map((r, i) => ({
-        ...r,
-        id: `ai_${Date.now()}_${i}`,
-        imageUrl: null
-      }));
-      setAiRecipes(prev => [...indexed, ...prev]);
-      showToast("Generated new recipes! ✨");
-    } catch (e) {
-      showToast("Failed to generate recipes.");
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
   const filters = [
     { id: 'Suggested', icon: ChefHat },
     { id: 'My Recipes', icon: BookOpen },
@@ -58,28 +36,35 @@ export default function Recipes({ inventory, customRecipes, favorites, onAddCust
 
   const getSuggestedRecipes = () => {
     let combined = [...aiRecipes, ...mockRecipes];
-    if (inventory.length > 0) {
-      // Sort by number of missing ingredients
-      combined = combined.sort((a, b) => {
-        const missingA = a.ingredients.filter(ing => !hasIngredient(ing)).length;
-        const missingB = b.ingredients.filter(ing => !hasIngredient(ing)).length;
-        return missingA - missingB;
-      });
-      // Filter out those missing more than 2 ingredients, but keep at least a few
-      const maxMissing = 2;
-      const filtered = combined.filter(r => r.ingredients.filter(ing => !hasIngredient(ing)).length <= maxMissing);
-      // If we have any that match the criteria, show them. Otherwise just show top 3 closest matches.
-      if (filtered.length > 0) {
-        return filtered;
-      } else {
-        return combined.slice(0, 3);
+    
+    // Sort by availability: percentage of ingredients owned descending, then absolute missing count ascending
+    return combined.sort((a, b) => {
+      const ownedA = a.ingredients.filter(ing => hasIngredient(ing)).length;
+      const ownedB = b.ingredients.filter(ing => hasIngredient(ing)).length;
+      const percentA = ownedA / a.ingredients.length;
+      const percentB = ownedB / b.ingredients.length;
+      
+      if (percentB !== percentA) {
+        return percentB - percentA;
       }
-    }
-    return combined;
+      
+      const missingA = a.ingredients.length - ownedA;
+      const missingB = b.ingredients.length - ownedB;
+      return missingA - missingB;
+    });
   };
 
   const renderRecipeCard = (recipe) => {
     const isFavorite = favorites.includes(recipe.id);
+    
+    // Sort ingredients: Matched (Salmon) followed by Missing (Grey)
+    const sortedIngredients = [...recipe.ingredients].sort((a, b) => {
+      const hasA = hasIngredient(a);
+      const hasB = hasIngredient(b);
+      if (hasA && !hasB) return -1;
+      if (!hasA && hasB) return 1;
+      return 0;
+    });
 
     return (
       <div 
@@ -110,16 +95,16 @@ export default function Recipes({ inventory, customRecipes, favorites, onAddCust
             </div>
           )}
           
-          {/* Ingredients */}
+          {/* Ingredients - Prioritize Salmon (matched) then Grey (missing) */}
           <div className="flex flex-wrap gap-2">
-            {recipe.ingredients.map(ingredient => {
+            {sortedIngredients.map(ingredient => {
                const isMatched = hasIngredient(ingredient);
                return (
                  <div 
                    key={ingredient} 
                    className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[12px] font-medium transition-colors ${
                      isMatched 
-                       ? 'bg-[#FFF0EC] text-brand' 
+                       ? 'bg-[#FF7A59] text-white shadow-sm' 
                        : 'bg-gray-100 text-gray-400'
                    }`}
                  >
@@ -148,6 +133,8 @@ export default function Recipes({ inventory, customRecipes, favorites, onAddCust
       </div>
     );
   };
+
+  const suggestedRecipes = getSuggestedRecipes();
 
   return (
     <div className="flex-1 flex flex-col pb-24 relative">
@@ -181,33 +168,18 @@ export default function Recipes({ inventory, customRecipes, favorites, onAddCust
           <>
             {/* Info Banner */}
             <div className="px-6 py-4 shrink-0">
-              <div className="bg-[#FFF5F2] rounded-xl p-4 flex flex-col gap-3">
-                <div className="flex items-center gap-3">
-                  <ChefHat className="text-[#FF7A59] shrink-0" size={20} />
-                  <p className="text-[14px] text-gray-800 tracking-tight">
-                    Based on <span className="font-bold">{inventory.length} fridge items</span>. 
-                  </p>
-                </div>
-                
-                <button 
-                  onClick={handleGenerateAI}
-                  disabled={isGenerating}
-                  className="w-full bg-[#FF7A59] text-white py-2.5 rounded-lg text-[14px] font-bold shadow-sm flex items-center justify-center gap-2 hover:bg-[#fa6b48] transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
-                >
-                  {isGenerating ? (
-                     <Loader2 size={16} className="animate-spin" />
-                  ) : (
-                     <Sparkles size={16} />
-                  )}
-                  {isGenerating ? 'Generating...' : 'Generate with AI'}
-                </button>
+              <div className="bg-[#FFF5F2] rounded-xl p-4 flex items-center gap-3">
+                <ChefHat className="text-[#FF7A59] shrink-0" size={20} />
+                <p className="text-[14px] text-gray-800 tracking-tight">
+                  Based on <span className="font-bold">{inventory.length} fridge items</span>.
+                </p>
               </div>
             </div>
 
             {/* Recipe List */}
             <div className="px-6 flex flex-col pb-6">
-              {getSuggestedRecipes().length > 0 ? (
-                getSuggestedRecipes().map(renderRecipeCard)
+              {suggestedRecipes.length > 0 ? (
+                suggestedRecipes.map(recipe => renderRecipeCard(recipe))
               ) : (
                 <div className="text-center py-6 text-gray-500">No suggestions match your inventory closely.</div>
               )}

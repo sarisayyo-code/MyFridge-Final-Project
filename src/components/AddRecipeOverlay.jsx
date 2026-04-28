@@ -1,6 +1,6 @@
 import { Camera, X, Plus, Clock, ChefHat } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function AddRecipeOverlay({ onClose, onAdd, inventory = [] }) {
   const [recipeName, setRecipeName] = useState('');
@@ -8,6 +8,9 @@ export default function AddRecipeOverlay({ onClose, onAdd, inventory = [] }) {
   const [difficulty, setDifficulty] = useState('Easy');
   const [ingredients, setIngredients] = useState(['', '']);
   const [instructions, setInstructions] = useState(['', '']);
+  const [previewUrl, setPreviewUrl] = useState(null);
+
+  const fileInputRef = useRef(null);
 
   // Lock body scroll when overlay is open
   useEffect(() => {
@@ -50,11 +53,23 @@ export default function AddRecipeOverlay({ onClose, onAdd, inventory = [] }) {
         difficulty,
         ingredients: ingredients.filter(i => i.trim() !== ''),
         instructions: instructions.filter(i => i.trim() !== ''),
-        imageUrl: null
+        imageUrl: previewUrl
       });
     }
     
     onClose();
+  };
+
+  const handlePhotoClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    }
   };
 
   const inputClass = "w-full border border-gray-100 bg-white rounded-[14px] px-4 py-3.5 text-[15px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-shadow";
@@ -95,9 +110,26 @@ export default function AddRecipeOverlay({ onClose, onAdd, inventory = [] }) {
         <div className="bg-[#FAFAFA] px-5 py-6 overflow-y-auto flex-1 pb-safe relative z-10">
           <form onSubmit={handleSubmit} className="flex flex-col gap-6 w-full max-w-lg mx-auto">
             {/* Add Photo Box */}
-            <button type="button" className="w-full h-32 rounded-[24px] border border-dashed border-gray-200 bg-white flex flex-col items-center justify-center gap-2 text-[#9CA3AF] hover:bg-gray-50 transition-colors">
-              <Camera size={28} className="text-[#9CA3AF]" strokeWidth={1.5} />
-              <span className="text-[15px] font-medium tracking-wide">Add Photo</span>
+            <input 
+              type="file" 
+              accept="image/*" 
+              className="hidden" 
+              ref={fileInputRef}
+              onChange={handleFileChange}
+            />
+            <button 
+              type="button" 
+              onClick={handlePhotoClick}
+              className="w-full h-32 rounded-[24px] border border-dashed border-gray-200 bg-white flex flex-col items-center justify-center gap-2 text-[#9CA3AF] hover:bg-gray-50 transition-colors overflow-hidden relative"
+            >
+              {previewUrl ? (
+                <img src={previewUrl} alt="Preview" className="absolute inset-0 w-full h-full object-cover" />
+              ) : (
+                <>
+                  <Camera size={28} className="text-[#9CA3AF]" strokeWidth={1.5} />
+                  <span className="text-[15px] font-medium tracking-wide">Add Photo</span>
+                </>
+              )}
             </button>
 
             {/* Recipe Name and Cook Time */}

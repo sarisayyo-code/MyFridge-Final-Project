@@ -93,17 +93,25 @@ export default function RecipeDetail({ recipe, inventory, onBack, onToggleFavori
           <div className="bg-white rounded-3xl p-6 shadow-[0_2px_8px_-4px_rgba(0,0,0,0.05)] border border-gray-50 flex flex-col gap-5">
             <h3 className="text-[17px] font-bold text-gray-900 tracking-tight">Ingredients</h3>
             <div className="flex flex-col gap-4">
-              {recipe.ingredients.map(ing => {
-                const matched = hasIngredient(ing);
-                return (
-                  <div key={ing} className="flex items-center gap-3.5">
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${matched ? 'bg-[#FF7A59]' : 'bg-gray-200'}`}>
-                      <Check size={14} className="text-white stroke-[3]" />
+              {[...recipe.ingredients]
+                .sort((a, b) => {
+                  const hasA = hasIngredient(a);
+                  const hasB = hasIngredient(b);
+                  if (hasA && !hasB) return -1;
+                  if (!hasA && hasB) return 1;
+                  return 0;
+                })
+                .map(ing => {
+                  const matched = hasIngredient(ing);
+                  return (
+                    <div key={ing} className="flex items-center gap-3.5">
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${matched ? 'bg-[#FF7A59]' : 'bg-gray-200'}`}>
+                        <Check size={14} className="text-white stroke-[3]" />
+                      </div>
+                      <span className={`text-[16px] ${matched ? 'text-gray-900' : 'text-gray-500 font-medium'}`}>{ing}</span>
                     </div>
-                    <span className={`text-[16px] ${matched ? 'text-gray-900' : 'text-gray-500'}`}>{ing}</span>
-                  </div>
-                )
-              })}
+                  )
+                })}
             </div>
           </div>
 

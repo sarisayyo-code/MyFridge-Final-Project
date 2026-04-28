@@ -51,12 +51,12 @@ export const mockInventory = [
   },
   {
     id: '6',
-    name: 'Cheddar Cheese',
+    name: 'Mozzarella Cheese',
     quantity: 150,
     unit: 'g',
     category: 'Dairy',
     expiryDays: 5,
-    imageUrl: 'https://images.unsplash.com/photo-1618164422027-5bff69eb6862?w=150&h=150&fit=crop',
+    imageUrl: 'https://images.unsplash.com/photo-1559561853-08451507cbe7?w=150&h=150&fit=crop',
     dateAdded: '2026-04-15T09:20:00.000Z'
   },
   {
@@ -94,30 +94,30 @@ export const mockInventory = [
 export const mockRecipes = [
   {
     id: 'r1',
-    title: 'Pasta Carbonara',
+    title: 'Pasta al Forno',
     time: '25 min',
     difficulty: 'Easy',
-    imageUrl: 'https://images.unsplash.com/photo-1612874742237-6526221588e3?w=400&h=200&fit=crop',
-    ingredients: ['Eggs', 'Pasta', 'Cheddar Cheese', 'Whole Milk'],
+    imageUrl: 'https://images.unsplash.com/photo-1546549032-9571cd6b27df?w=400&h=200&fit=crop',
+    ingredients: ['Eggs', 'Pasta', 'Mozzarella Cheese', 'Whole Milk'],
     instructions: [
       'Boil pasta until al dente.',
-      'Whisk eggs with cheese.',
-      'Combine hot pasta with egg mixture off heat.',
-      'Season and serve immediately.'
+      'Mix pasta with bechamel and mozzarella.',
+      'Bake until cheese is bubbly.',
+      'Serve hot.'
     ]
   },
   {
     id: 'r2',
-    title: 'Cheese Omelette',
+    title: 'Fluffy Mozzarella Omelette',
     time: '10 min',
     difficulty: 'Easy',
-    imageUrl: 'https://images.unsplash.com/photo-1510693062568-d018bb041dc5?w=400&h=200&fit=crop',
-    ingredients: ['Eggs', 'Cheddar Cheese', 'Whole Milk'],
+    imageUrl: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=400&h=200&fit=crop',
+    ingredients: ['Eggs', 'Mozzarella Cheese', 'Whole Milk'],
     instructions: [
       'Beat the eggs with a splash of milk.',
       'Pour into a heated, oiled pan.',
-      'Add cheese to one half and fold over.',
-      'Cook for another minute until cheese melts.'
+      'Add mozzarella to one half and fold over.',
+      'Cook until cheese is perfectly melted.'
     ]
   },
   {
@@ -145,6 +145,90 @@ export const mockRecipes = [
       'Chop bell peppers into bite-sized pieces.',
       'In a bowl, mix spinach and bell peppers.',
       'Top with a dollop of greek yogurt as a healthy dressing.'
+    ]
+  },
+  {
+    id: 'r5',
+    title: 'Gourmet Margherita Pizza',
+    time: '45 min',
+    difficulty: 'Medium',
+    imageUrl: 'https://images.unsplash.com/photo-1574071318508-1cdbad80ad38?w=400&h=200&fit=crop',
+    ingredients: ['Mozzarella Cheese', 'Tomato Sauce', 'Fresh Basil', 'Pizza Flour'],
+    instructions: [
+      'Roll out the pizza dough.',
+      'Spread tomato sauce evenly.',
+      'Add fresh mozzarella pieces.',
+      'Bake at 450°F until crust is golden.',
+      'Garnish with fresh basil before serving.'
+    ]
+  },
+  {
+    id: 'r6',
+    title: 'Classic Caesar Salad',
+    time: '15 min',
+    difficulty: 'Easy',
+    imageUrl: 'https://images.unsplash.com/photo-1550304943-4f24f54ddde9?w=400&h=200&fit=crop',
+    ingredients: ['Romaine Lettuce', 'Grilled Chicken', 'Parmesan Cheese', 'Croutons', 'Caesar Dressing'],
+    instructions: [
+      'Chop romaine lettuce into bite-sized pieces.',
+      'Slice grilled chicken.',
+      'Toss lettuce with dressing and croutons.',
+      'Top with chicken and parmesan shavings.'
+    ]
+  },
+  {
+    id: 'r7',
+    title: 'Creamy Mushroom Risotto',
+    time: '40 min',
+    difficulty: 'Hard',
+    imageUrl: 'https://images.unsplash.com/photo-1476124369491-e7addf5db371?w=400&h=200&fit=crop',
+    ingredients: ['Arborio Rice', 'Mushrooms', 'Vegetable Broth', 'Onion', 'Parmesan Cheese'],
+    instructions: [
+      'Sauté onions and mushrooms in butter.',
+      'Add rice and toast for 2 minutes.',
+      'Slowly add warm broth, one ladle at a time, stirring constantly.',
+      'Finish with parmesan and a knob of butter once rice is creamy.'
+    ]
+  },
+  {
+    id: 'r8',
+    title: 'Truffle Mushroom Pasta',
+    time: '30 min',
+    difficulty: 'Medium',
+    imageUrl: 'https://images.unsplash.com/photo-1556761223-4c4282c73f77?w=400&h=200&fit=crop',
+    ingredients: ['Pasta', 'Mushrooms', 'Truffle Oil', 'Parmesan Cheese', 'Garlic'],
+    instructions: [
+      'Cook pasta according to package instructions.',
+      'Sauté garlic and mushrooms in olive oil until golden.',
+      'Toss pasta with mushrooms and a drizzle of truffle oil.',
+      'Top with plenty of parmesan cheese.'
+    ]
+  },
+  {
+    id: 'r9',
+    title: 'Fresh Caprese Skewers',
+    time: '15 min',
+    difficulty: 'Easy',
+    imageUrl: 'https://images.unsplash.com/photo-1529312266912-b33cfce2eefd?w=400&h=200&fit=crop',
+    ingredients: ['Mozzarella Cheese', 'Cherry Tomatoes', 'Fresh Basil', 'Balsamic Glaze'],
+    instructions: [
+      'Thread a cherry tomato, basil leaf, and mozzarella ball onto a small skewer.',
+      'Repeat until all ingredients are used.',
+      'Drizzle with balsamic glaze and a pinch of salt.'
+    ]
+  },
+  {
+    id: 'r10',
+    title: 'Avocado Toast with Poached Egg',
+    time: '12 min',
+    difficulty: 'Easy',
+    imageUrl: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=400&h=200&fit=crop',
+    ingredients: ['Bread', 'Avocado', 'Eggs', 'Chili Flakes'],
+    instructions: [
+      'Toast your bread until golden brown.',
+      'Mash avocado with salt and pepper, spread on toast.',
+      'Poach an egg for 3 minutes until white is set but yolk is runny.',
+      'Place egg on toast and sprinkle with chili flakes.'
     ]
   }
 ];

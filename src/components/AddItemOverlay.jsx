@@ -1,6 +1,6 @@
 import { Camera, X } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function AddItemOverlay({ onClose, onAdd }) {
   const [name, setName] = useState('');
@@ -9,6 +9,9 @@ export default function AddItemOverlay({ onClose, onAdd }) {
   const [unit, setUnit] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
   const [notes, setNotes] = useState('');
+  const [previewUrl, setPreviewUrl] = useState(null);
+  
+  const fileInputRef = useRef(null);
 
   // Lock body scroll when overlay is open
   useEffect(() => {
@@ -71,8 +74,20 @@ export default function AddItemOverlay({ onClose, onAdd }) {
       quantity: parseFloat(quantity) || 1,
       unit: unit || 'pcs',
       expiryDays,
-      imageUrl: fallbackImageUrl,
+      imageUrl: previewUrl || fallbackImageUrl,
     });
+  };
+
+  const handlePhotoClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    }
   };
 
   const inputClass = "w-full border border-gray-100 bg-white rounded-[14px] px-4 py-3.5 text-[15px] text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-shadow";
@@ -112,9 +127,26 @@ export default function AddItemOverlay({ onClose, onAdd }) {
         <div className="bg-[#fcfcfc] px-6 py-6 overflow-y-auto flex-1 rounded-t-3xl -mt-4 pb-12">
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             {/* Add Photo Box */}
-            <button type="button" className="w-full h-28 rounded-2xl border-2 border-dashed border-gray-200 bg-white flex flex-col items-center justify-center gap-2 text-gray-400 hover:bg-gray-50 transition-colors">
-              <Camera size={28} className="text-gray-300" />
-              <span className="text-sm font-medium">Add Photo</span>
+            <input 
+              type="file" 
+              accept="image/*" 
+              className="hidden" 
+              ref={fileInputRef}
+              onChange={handleFileChange}
+            />
+            <button 
+              type="button" 
+              onClick={handlePhotoClick}
+              className="w-full h-28 rounded-2xl border-2 border-dashed border-gray-200 bg-white flex flex-col items-center justify-center gap-2 text-gray-400 hover:bg-gray-50 transition-colors overflow-hidden relative"
+            >
+              {previewUrl ? (
+                <img src={previewUrl} alt="Preview" className="absolute inset-0 w-full h-full object-cover" />
+              ) : (
+                <>
+                  <Camera size={28} className="text-gray-300" />
+                  <span className="text-sm font-medium">Add Photo</span>
+                </>
+              )}
             </button>
 
             {/* Name and Category (Side by Side in image?) Wait, image shows them side by side! */}
