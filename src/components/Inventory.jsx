@@ -1,9 +1,10 @@
-import { Clock, AlertTriangle, ArrowDownUp, Plus } from 'lucide-react';
+import { Clock, AlertTriangle, ArrowDownUp, Plus, X } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Inventory({ inventory, onItemClick, onAddClick, onClearAll }) {
   const [activeFilter, setActiveFilter] = useState('All');
   const [sortBy, setSortBy] = useState('expiry');
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   const totalItems = inventory.length;
   const expiringSoon = inventory.filter(i => i.expiryDays <= 2).length;
@@ -132,8 +133,8 @@ export default function Inventory({ inventory, onItemClick, onAddClick, onClearA
         {sortedInventory.length > 0 && (
           <div className="mt-6 flex justify-center pb-8 z-10 relative">
             <button 
-              onClick={onClearAll}
-              className="text-red-500 font-bold text-sm bg-red-50 px-6 py-2.5 rounded-full hover:bg-red-100 transition-colors border border-red-100"
+              onClick={() => setShowClearConfirm(true)}
+              className="text-gray-500 font-bold text-sm bg-gray-50 px-6 py-2.5 rounded-full hover:bg-gray-100 transition-colors border border-gray-200"
             >
               Clear All Inventory
             </button>
@@ -150,6 +151,42 @@ export default function Inventory({ inventory, onItemClick, onAddClick, onClearA
           </div>
         </button>
       </div>
+
+      {/* Clear Confirmation Popup */}
+      {showClearConfirm && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-[320px] rounded-[24px] p-6 flex flex-col gap-5 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+            <button onClick={() => setShowClearConfirm(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 bg-gray-50 hover:bg-gray-100 p-1.5 rounded-full transition-colors">
+              <X size={20} />
+            </button>
+            
+            <div className="flex flex-col gap-2 pt-2">
+              <h3 className="text-xl font-bold text-gray-900 pr-8">Clear all?</h3>
+              <p className="text-sm font-medium text-gray-500 leading-relaxed">
+                Are you sure you want to clear your entire inventory? This action cannot be undone.
+              </p>
+            </div>
+            
+            <div className="flex flex-col gap-2 mt-2">
+              <button 
+                onClick={() => {
+                  onClearAll();
+                  setShowClearConfirm(false);
+                }}
+                className="w-full py-3.5 rounded-xl bg-gray-800 text-white font-bold text-[15px] shadow-sm transition-all hover:bg-gray-900"
+              >
+                Yes, Clear All
+              </button>
+              <button 
+                onClick={() => setShowClearConfirm(false)}
+                className="w-full py-3.5 rounded-xl bg-gray-100 text-gray-700 font-bold text-[15px] transition-all hover:bg-gray-200"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
