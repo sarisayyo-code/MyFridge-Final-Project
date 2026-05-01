@@ -2,8 +2,8 @@ export const mockInventory = [
   {
     id: '1',
     name: 'Whole Milk',
-    quantity: 1,
-    unit: 'L',
+    quantity: 1000,
+    unit: 'g',
     category: 'Dairy',
     expiryDays: 1,
     imageUrl: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=150&h=150&fit=crop',
@@ -11,13 +11,31 @@ export const mockInventory = [
   },
   {
     id: '2',
-    name: 'Chicken Breast',
+    name: 'Chicken',
     quantity: 400,
     unit: 'g',
     category: 'Meat',
-    expiryDays: 2,
+    expiryDays: 5,
     imageUrl: 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=150&h=150&fit=crop',
-    dateAdded: '2026-04-26T12:00:00.000Z'
+    dateAdded: '2026-04-26T12:00:00.000Z',
+    batches: [
+      {
+        id: '2_badge_1',
+        dateAdded: '2026-04-26T12:00:00.000Z',
+        quantity: 100,
+        originalQuantity: 100,
+        expiryDays: 4,
+        note: 'wing'
+      },
+      {
+        id: '2_badge_2',
+        dateAdded: '2026-04-26T12:00:00.000Z',
+        quantity: 300,
+        originalQuantity: 300,
+        expiryDays: 5,
+        note: 'breast'
+      }
+    ]
   },
   {
     id: '3',
@@ -32,8 +50,8 @@ export const mockInventory = [
   {
     id: '4',
     name: 'Eggs',
-    quantity: 6,
-    unit: 'pcs',
+    quantity: 300,
+    unit: 'g',
     category: 'Others',
     expiryDays: 3,
     imageUrl: 'https://images.unsplash.com/photo-1587486913049-53fc88980cfc?w=150&h=150&fit=crop',
@@ -62,8 +80,8 @@ export const mockInventory = [
   {
     id: '7',
     name: 'Bell Peppers',
-    quantity: 3,
-    unit: 'pcs',
+    quantity: 300,
+    unit: 'g',
     category: 'Vegetables',
     expiryDays: 6,
     imageUrl: 'https://images.unsplash.com/photo-1563514227147-6d2ff665a6a0?w=150&h=150&fit=crop',
@@ -126,7 +144,7 @@ export const mockRecipes = [
     time: '15 min',
     difficulty: 'Easy',
     imageUrl: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=200&fit=crop',
-    ingredients: ['Bell Peppers', 'Spinach', 'Chicken Breast'],
+    ingredients: ['Bell Peppers', 'Spinach', 'Chicken'],
     instructions: [
       'Slice chicken and bell peppers into strips.',
       'Stir fry chicken until cooked through.',

@@ -5,8 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 export default function AddItemOverlay({ onClose, onAdd }) {
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
-  const [quantity, setQuantity] = useState('1');
-  const [unit, setUnit] = useState('');
+  const [quantity, setQuantity] = useState('100');
   const [expiryDate, setExpiryDate] = useState('');
   const [notes, setNotes] = useState('');
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -72,8 +71,9 @@ export default function AddItemOverlay({ onClose, onAdd }) {
       name,
       category,
       quantity: parseFloat(quantity) || 1,
-      unit: unit || 'pcs',
+      unit: 'g',
       expiryDays,
+      notes,
       imageUrl: previewUrl || fallbackImageUrl,
     });
   };
@@ -187,38 +187,16 @@ export default function AddItemOverlay({ onClose, onAdd }) {
 
             {/* Quantity and Unit */}
             <div className="flex gap-4">
-              <div className="flex-[3]">
-                <label className={labelClass}>Quantity *</label>
+              <div className="flex-1">
+                <label className={labelClass}>Quantity (g) *</label>
                 <input 
                   type="number" 
                   min="0"
-                  step="0.1"
+                  step="1"
                   value={quantity}
                   onChange={(e) => setQuantity(e.target.value)}
                   className={inputClass}
                 />
-              </div>
-              <div className="flex-[2]">
-                <label className={labelClass}>Unit</label>
-                <div className="relative">
-                  <select 
-                    value={unit}
-                    onChange={(e) => setUnit(e.target.value)}
-                    className={`${inputClass} appearance-none pr-10`}
-                  >
-                    <option value="" disabled></option>
-                    <option value="pcs">pcs</option>
-                    <option value="g">g</option>
-                    <option value="kg">kg</option>
-                    <option value="ml">ml</option>
-                    <option value="L">L</option>
-                  </select>
-                  <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-gray-800">
-                    <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M1.5 1.5L6 6L10.5 1.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </div>
-                </div>
               </div>
             </div>
 

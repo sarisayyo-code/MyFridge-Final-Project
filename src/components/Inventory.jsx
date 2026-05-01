@@ -1,7 +1,7 @@
 import { Clock, AlertTriangle, ArrowDownUp, Plus } from 'lucide-react';
 import { useState } from 'react';
 
-export default function Inventory({ inventory, onItemClick, onAddClick }) {
+export default function Inventory({ inventory, onItemClick, onAddClick, onClearAll }) {
   const [activeFilter, setActiveFilter] = useState('All');
   const [sortBy, setSortBy] = useState('expiry');
 
@@ -31,7 +31,8 @@ export default function Inventory({ inventory, onItemClick, onAddClick }) {
     if (sortBy === 'expiry') return a.expiryDays - b.expiryDays;
     if (sortBy === 'name') return a.name.localeCompare(b.name);
     if (sortBy === 'quantity') return b.quantity - a.quantity;
-    if (sortBy === 'dateAdded') return new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime();
+    if (sortBy === 'dateAddedDesc') return new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime();
+    if (sortBy === 'dateAddedAsc') return new Date(a.dateAdded).getTime() - new Date(b.dateAdded).getTime();
     return 0;
   });
 
@@ -85,7 +86,8 @@ export default function Inventory({ inventory, onItemClick, onAddClick }) {
           <option value="expiry">Sort by: Expiry Date</option>
           <option value="name">Sort by: Name</option>
           <option value="quantity">Sort by: Quantity</option>
-          <option value="dateAdded">Sort by: Date Added</option>
+          <option value="dateAddedDesc">Sort by: Date Added (Newest)</option>
+          <option value="dateAddedAsc">Sort by: Date Added (Oldest)</option>
         </select>
       </div>
 
@@ -124,6 +126,18 @@ export default function Inventory({ inventory, onItemClick, onAddClick }) {
               )}
             </div>
           ))
+        )}
+
+        {/* Clear All Button */}
+        {sortedInventory.length > 0 && (
+          <div className="mt-6 flex justify-center pb-8 z-10 relative">
+            <button 
+              onClick={onClearAll}
+              className="text-red-500 font-bold text-sm bg-red-50 px-6 py-2.5 rounded-full hover:bg-red-100 transition-colors border border-red-100"
+            >
+              Clear All Inventory
+            </button>
+          </div>
         )}
 
         {/* FAB */}

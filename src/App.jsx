@@ -47,15 +47,39 @@ export default function App() {
     showToast('Recipe removed! 🗑️');
   };
 
-  const handleCookIngredients = (matchedIngredients) => {
+  const handleCookIngredients = (usedQuantities) => {
     setInventory(prev => prev.map(item => {
-      const isMatched = matchedIngredients.some(ing => 
-        item.name.toLowerCase().includes(ing.toLowerCase()) ||
-        ing.toLowerCase().includes(item.name.toLowerCase())
-      );
-      if (isMatched) {
-        let deduct = (item.unit === 'g' || item.unit === 'ml') ? 100 : 1;
-        return { ...item, quantity: item.quantity - deduct };
+      const deductAmount = usedQuantities[item.id];
+      if (deductAmount !== undefined && deductAmount > 0) {
+        let remainingToDeduct = deductAmount;
+        let newBadges = item.batches ? [...item.batches] : [{
+          id: item.id + '_badge',
+          dateAdded: item.dateAdded || new Date().toISOString(),
+          quantity: item.quantity,
+          originalQuantity: item.originalQuantity || item.quantity,
+          expiryDays: item.expiryDays
+        }];
+        
+        // Sort by expiry asc to deduct from oldest/expiring-first
+        newBadges.sort((a, b) => a.expiryDays - b.expiryDays);
+        
+        const updatedBadges = newBadges.map(b => {
+           if (remainingToDeduct <= 0) return b;
+           if (b.quantity >= remainingToDeduct) {
+              const updatedB = { ...b, quantity: b.quantity - remainingToDeduct };
+              remainingToDeduct = 0;
+              return updatedB;
+           } else {
+              remainingToDeduct -= b.quantity;
+              return { ...b, quantity: 0 };
+           }
+        }).filter(b => b.quantity > 0);
+
+        return { 
+          ...item, 
+          quantity: Math.max(0, item.quantity - deductAmount),
+          batches: updatedBadges
+        };
       }
       return item;
     }).filter(item => item.quantity > 0));
@@ -67,22 +91,82 @@ export default function App() {
     setSelectedItem(prev => prev && prev.id === id ? { ...prev, quantity: newQuantity } : prev);
   };
 
+  const handleUpdateItem = (updatedItem) => {
+    setInventory(prev => prev.map(item => item.id === updatedItem.id ? updatedItem : item));
+    setSelectedItem(updatedItem);
+  };
+
   const handleRemoveItem = (id) => {
     setInventory(prev => prev.filter(item => item.id !== id));
     setSelectedItem(null);
     showToast('Item removed from fridge! 🗑️');
   };
 
+  const handleClearAll = () => {
+    setInventory([]);
+    setSelectedItem(null);
+    showToast('Inventory cleared! 🗑️');
+  };
+
   const handleAddNewItem = (newItem) => {
-    const item = {
-      ...newItem,
-      id: Math.random().toString(36).substring(7) + Date.now().toString(),
-      dateAdded: new Date().toISOString(),
-      originalQuantity: newItem.quantity
-    };
-    setInventory(prev => [...prev, item]);
+    setInventory(prev => {
+      const existingItemIndex = prev.findIndex(item => item.name.toLowerCase() === newItem.name.toLowerCase());
+      if (existingItemIndex !== -1) {
+        // Merge with existing item
+        const updatedInventory = [...prev];
+        const existingItem = updatedInventory[existingItemIndex];
+        
+        const oldBatches = existingItem.batches || [
+          {
+            id: existingItem.id + '_orig',
+            dateAdded: existingItem.dateAdded,
+            quantity: existingItem.quantity,
+            originalQuantity: existingItem.originalQuantity || existingItem.quantity,
+            expiryDays: existingItem.expiryDays
+          }
+        ];
+        
+        const newBatch = {
+          id: Math.random().toString(36).substring(7) + Date.now().toString(),
+          dateAdded: new Date().toISOString(),
+          quantity: newItem.quantity,
+          originalQuantity: newItem.quantity,
+          expiryDays: newItem.expiryDays
+        };
+
+        updatedInventory[existingItemIndex] = {
+          ...existingItem,
+          quantity: existingItem.quantity + newItem.quantity,
+          originalQuantity: (existingItem.originalQuantity || existingItem.quantity) + newItem.quantity,
+          expiryDays: Math.min(existingItem.expiryDays, newItem.expiryDays),
+          batches: [...oldBatches, newBatch].sort((a, b) => a.expiryDays - b.expiryDays),
+          notes: newItem.notes ? (existingItem.notes ? `${existingItem.notes} | ${newItem.notes}` : newItem.notes) : existingItem.notes
+        };
+        showToast(`Added ${newItem.quantity}g badge to ${existingItem.name}! ✅`);
+        return updatedInventory;
+      } else {
+        // Add new item
+        const addedDate = new Date().toISOString();
+        const itemId = Math.random().toString(36).substring(7) + Date.now().toString();
+        const item = {
+          ...newItem,
+          id: itemId,
+          dateAdded: addedDate,
+          originalQuantity: newItem.quantity,
+          batches: [{
+            id: itemId + '_badge',
+            dateAdded: addedDate,
+            quantity: newItem.quantity,
+            originalQuantity: newItem.quantity,
+            expiryDays: newItem.expiryDays,
+            note: newItem.notes
+          }]
+        };
+        showToast(`Added ${item.name} to fridge! ✅`);
+        return [...prev, item];
+      }
+    });
     setIsAddOverlayOpen(false);
-    showToast(`Added ${item.name} to fridge! ✅`);
   };
 
   return (
@@ -131,6 +215,7 @@ export default function App() {
               item={selectedItem} 
               onBack={() => setSelectedItem(null)} 
               onUpdateQuantity={handleUpdateQuantity}
+              onUpdateItem={handleUpdateItem}
               onRemove={handleRemoveItem}
               showToast={showToast}
             />
@@ -139,6 +224,7 @@ export default function App() {
               inventory={inventory} 
               onItemClick={setSelectedItem} 
               onAddClick={() => setIsAddOverlayOpen(true)}
+              onClearAll={handleClearAll}
             />
           ) : (
             <Recipes 
