@@ -1,5 +1,5 @@
 import { ChevronLeft, Clock, Trash2, Plus, X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 function BadgeBox({ badge, unit, getExpiryStyle, onConsumeChange }) {
   const initialConsumedPercent = badge.originalQuantity 
@@ -27,7 +27,7 @@ function BadgeBox({ badge, unit, getExpiryStyle, onConsumeChange }) {
        <div className="flex items-start justify-between">
          <div className="flex flex-col">
             <span className="text-xs font-bold text-gray-800 tracking-wide uppercase">Added: {formattedAdded}</span>
-            {badge.note && <span className="text-[13px] font-bold text-[#FF7A59] mt-0.5">{badge.note}</span>}
+            {badge.note && <span className="text-[13px] font-bold text-[#FF7A59] mt-0.5"><span className="text-gray-500 font-medium">Note:</span> {badge.note}</span>}
             <div className="flex items-center gap-2 mt-0.5">
                <span className="text-xs text-gray-500">Exp: {formattedExpiry}</span>
                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${getExpiryStyle(badge.expiryDays)}`}>
@@ -79,8 +79,30 @@ export default function ItemDetail({ item, onBack, onUpdateItem, onRemove, showT
   const [changes, setChanges] = useState({});
   const [isAddingBadge, setIsAddingBadge] = useState(false);
   const [addQuantity, setAddQuantity] = useState('100');
-  const [addExpiry, setAddExpiry] = useState('5');
+  const [addExpiryDate, setAddExpiryDate] = useState('');
   const [addNote, setAddNote] = useState('');
+
+  // Set default expiry based on category when adding a badge
+  useEffect(() => {
+    if (isAddingBadge) {
+      const category = item.category;
+      let daysToAdd = 14;
+      switch (category) {
+        case 'Vegetables': daysToAdd = 7; break;
+        case 'Fruit': daysToAdd = 5; break;
+        case 'Meat': daysToAdd = 3; break;
+        case 'Dairy': daysToAdd = 7; break;
+        default: daysToAdd = 14; 
+      }
+      const today = new Date();
+      const expDate = new Date(today);
+      expDate.setDate(expDate.getDate() + daysToAdd);
+      const year = expDate.getFullYear();
+      const month = String(expDate.getMonth() + 1).padStart(2, '0');
+      const day = String(expDate.getDate()).padStart(2, '0');
+      setAddExpiryDate(`${year}-${month}-${day}`);
+    }
+  }, [isAddingBadge, item.category]);
 
   const handleConsumeChange = (badgeId, percent, initialPercent) => {
     setChanges(prev => {
@@ -93,15 +115,24 @@ export default function ItemDetail({ item, onBack, onUpdateItem, onRemove, showT
 
   const handleAddNewBadge = () => {
     const parsedQ = parseFloat(addQuantity);
-    const parsedDays = parseInt(addExpiry, 10);
-    if (!parsedQ || parsedQ <= 0 || !parsedDays || parsedDays <= 0) return;
+    if (!parsedQ || parsedQ <= 0 || !addExpiryDate) return;
+
+    // Calculate expiry days from selected date
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const expDate = new Date(addExpiryDate);
+    // Adjust for timezone differences
+    expDate.setMinutes(expDate.getMinutes() + expDate.getTimezoneOffset());
+    
+    const diffTime = expDate.getTime() - today.getTime();
+    const expiryDays = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
 
     const newBadge = {
       id: Math.random().toString(36).substring(7) + Date.now().toString(),
       dateAdded: new Date().toISOString(),
       quantity: parsedQ,
       originalQuantity: parsedQ,
-      expiryDays: parsedDays,
+      expiryDays: expiryDays,
       note: addNote
     };
 
@@ -110,7 +141,7 @@ export default function ItemDetail({ item, onBack, onUpdateItem, onRemove, showT
       ...item,
       quantity: item.quantity + parsedQ,
       batches: newBadges,
-      expiryDays: Math.min(item.expiryDays, parsedDays)
+      expiryDays: Math.min(item.expiryDays, expiryDays)
     });
 
     setIsAddingBadge(false);
@@ -118,7 +149,7 @@ export default function ItemDetail({ item, onBack, onUpdateItem, onRemove, showT
     
     // reset form
     setAddQuantity('100');
-    setAddExpiry('5');
+    setAddExpiryDate('');
     setAddNote('');
   };
 
@@ -265,13 +296,11 @@ export default function ItemDetail({ item, onBack, onUpdateItem, onRemove, showT
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-bold text-gray-700">Expiry (days)</label>
+                <label className="text-sm font-bold text-gray-700">Expiry Date</label>
                 <input 
-                  type="number" 
-                  min="1"
-                  step="1"
-                  value={addExpiry}
-                  onChange={(e) => setAddExpiry(e.target.value)}
+                  type="date" 
+                  value={addExpiryDate}
+                  onChange={(e) => setAddExpiryDate(e.target.value)}
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-[#FF7A59]/20 focus:border-[#FF7A59]"
                 />
               </div>

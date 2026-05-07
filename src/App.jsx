@@ -158,8 +158,7 @@ export default function App() {
             dateAdded: addedDate,
             quantity: newItem.quantity,
             originalQuantity: newItem.quantity,
-            expiryDays: newItem.expiryDays,
-            note: newItem.notes
+            expiryDays: newItem.expiryDays
           }]
         };
         showToast(`Added ${item.name} to fridge! ✅`);
